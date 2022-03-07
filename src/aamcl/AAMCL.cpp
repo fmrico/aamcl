@@ -13,40 +13,61 @@
 // limitations under the License.
 
 #include "aamcl/AAMCL.h"
-#include "geometry_msgs/Point.h"
-#include "geometry_msgs/PoseArray.h"
-#include "nav_msgs/OccupancyGrid.h"
-#include "nav_msgs/MapMetaData.h"
-#include "ros/ros.h"
-#include <vector>
-#include <math.h>
-#include <time.h>
-#include "tf2/LinearMath/Quaternion.h"
-#include <costmap_2d/costmap_2d_ros.h>
-#include <random>
-#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
-#include <tf/transform_broadcaster.h>
-#include "gazebo_msgs/ModelStates.h"
 
-//sensors
-#include <sensor_msgs/LaserScan.h>
-*/
+#include "ros/ros.h"
+
 namespace aamcl
 {
 
- typedef struct {
-    geometry_msgs::Pose pose;
-    float prob;
- } Particle;
+AAMCL::AAMCL()
+: nh_()
+{
+  pub_particles_ = nh_.advertise<geometry_msgs::PoseArray>("poses", 100);
+  init();
+}
 
- class AAMCL
-  {
+AAMCL::init()
+{
+  particles_.resize(NUM_PART);
 
-
-  public:
-   AAMCL::AAMCL(): n_();vec_part_(NUM_PART)
-    {   
-    }
+  for (auto & particle : particles_) {
+    particle.prob = 1.0 / NUM_PART;
+    particle.pose.setOrigin(tf2::Vector3(0.0, 0.0, 0.0));
+    particle.pose.setRotation(tf2::Quaternion(0.0, 0.0, 0.0));
   }
+}
+
+void
+AAMCL::step()
+{
+  if (pub_particles_.getNumSubscribers() > 0) {
+    publish_particles();
+  }
+}
+
+void
+AAMCL::publish_particles()
+{
+  geometry_msgs::PoseArray msg;
+
+  for (auto & particle : particles_) {
+    geometry_msgs::Pose pose_msg;
+
+    const auto translation = particle.pose.getOrigin();
+    const auto rotation = particle.pose.getRotation();
+
+    tf2:: pose_msg.position = translation. .x = translation.x();
+    pose_msg.position.y = translation.y();
+    pose_msg.position.z = translation.z();
+
+    pose_msg.position.x = translation.x();
+    pose_msg.position.y = translation.y();
+    pose_msg.position.z = translation.z();
+
+    particle.prob = 1.0 / NUM_PART;
+    particle.pose.setOrigin(tf2::Vector3(0.0, 0.0, 0.0));
+    particle.pose.setRotation(tf2::Quaternion(0.0, 0.0, 0.0));
+  }
+}
 
 }  // namespace aamcl

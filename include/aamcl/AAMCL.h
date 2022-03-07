@@ -15,19 +15,41 @@
 #ifndef AAMCL_AAMCL_H
 #define AAMCL_AAMCL_H
 
+#include "geometry_msgs/PoseArray.h"
+
+#include "tf2/LinearMath/Transform.h"
 #include "ros/ros.h"
 
 
 namespace aamcl
 {
 
+typedef struct {
+  tf2::Transform pose;
+  double prob;
+} Particle;
+
+
 class AAMCL
 {
 public:
   AAMCL();
 
+  void init();
+  void step();
+
+protected:
+  void publish_particles();
+
 private:
-  ros::NodeHandle n_;
+  ros::NodeHandle nh_;
+  ros::Publisher pub_particles_;
+
+  static const int NUM_PART = 1;
+
+  std::vector<Particle> particles_; 
+
+  
 };
 
 }  // namespace aamcl

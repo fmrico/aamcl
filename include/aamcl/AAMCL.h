@@ -17,6 +17,7 @@
 
 #include "geometry_msgs/PoseArray.h"
 
+#include "tf2_ros/transform_listener.h"
 #include "tf2/LinearMath/Transform.h"
 #include "ros/ros.h"
 
@@ -40,16 +41,20 @@ public:
 
 protected:
   void publish_particles();
+  void predict();
 
 private:
   ros::NodeHandle nh_;
   ros::Publisher pub_particles_;
+  
+  tf2_ros::Buffer buffer_;
+  tf2_ros::TransformListener listener_;
+  tf2::Stamped<tf2::Transform> odom2prevbf_;
+  bool valid_prev_odom2bf_ {false};
 
   static const int NUM_PART = 1;
+  std::vector<Particle> particles_;
 
-  std::vector<Particle> particles_; 
-
-  
 };
 
 }  // namespace aamcl
